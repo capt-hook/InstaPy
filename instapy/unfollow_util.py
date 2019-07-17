@@ -614,8 +614,6 @@ def unfollow(browser,
                                  person in automatedFollowedPool[
                                      "all"].keys() else False)
 
-                    unfollow_state = False
-
                     try:
                         unfollow_state, msg = unfollow_user(browser,
                                                             "dialog",
@@ -626,28 +624,29 @@ def unfollow(browser,
                                                             relationship_data,
                                                             logger,
                                                             logfolder)
+
+                        if unfollow_state is True:
+                            unfollowNum += 1
+                            # reset jump counter after a successful unfollow
+                            jumps["consequent"]["unfollows"] = 0
+
+                        elif msg == "jumped":
+                            # will break the loop after certain consecutive jumps
+                            jumps["consequent"]["unfollows"] += 1
+
+                        elif msg in ["temporary block", "not connected",
+                                     "not logged in"]:
+                            # break the loop in extreme conditions to prevent
+                            # misbehaviours
+                            logger.warning(
+                                "There is a serious issue: '{}'!\t~leaving "
+                                "Unfollow-Users activity".format(
+                                    msg))
+                            break
+                                                            
                     except Exception as exc:
                         logger.error("Unfollow loop error:\n\n{}\n\n".format(
                             str(exc).encode('utf-8')))
-
-                    if unfollow_state is True:
-                        unfollowNum += 1
-                        # reset jump counter after a successful unfollow
-                        jumps["consequent"]["unfollows"] = 0
-
-                    elif msg == "jumped":
-                        # will break the loop after certain consecutive jumps
-                        jumps["consequent"]["unfollows"] += 1
-
-                    elif msg in ["temporary block", "not connected",
-                                 "not logged in"]:
-                        # break the loop in extreme conditions to prevent
-                        # misbehaviours
-                        logger.warning(
-                            "There is a serious issue: '{}'!\t~leaving "
-                            "Unfollow-Users activity".format(
-                                msg))
-                        break
 
                     # To only sleep once until there is the next unfollow
                     if hasSlept:
