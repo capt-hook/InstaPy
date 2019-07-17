@@ -614,6 +614,8 @@ def unfollow(browser,
                                  person in automatedFollowedPool[
                                      "all"].keys() else False)
 
+                    unfollow_state = False
+
                     try:
                         unfollow_state, msg = unfollow_user(browser,
                                                             "dialog",
@@ -658,7 +660,7 @@ def unfollow(browser,
                             person))
 
         except Exception as exc:
-            logger.error("Unfollow loop error:\n\n{}\n\n".format(
+            logger.error("Fatal unfollow loop error:\n\n{}\n\n".format(
                 str(exc).encode('utf-8')))
 
     else:
@@ -1642,4 +1644,3 @@ def refresh_follow_time_in_pool(username, person, person_id, extra_secs, logger,
 
     # return the username with new timestamp
     log_followed_pool(username, person, logger, logfolder, logtime, person_id)
-
